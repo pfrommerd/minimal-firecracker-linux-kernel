@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /build
 
 # Kernel version to build
-ARG KERNEL_VERSION=6.8.12
+ARG KERNEL_VERSION=6.18.58
 
 # Download and extract kernel source
 RUN wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz && \

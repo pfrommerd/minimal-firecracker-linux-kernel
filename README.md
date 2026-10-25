@@ -23,15 +23,15 @@ docker run --rm -v $(pwd)/kernel-output:/output-mount firecracker-kernel-builder
 After building, you'll find:
 ```
 kernel-output/
-├── vmlinux-6.8.12-firecracker-minimal    # The kernel image (uncompressed)
-└── config-6.8.12                         # The kernel config used
+├── vmlinux-6.18.58-firecracker-minimal   # The kernel image (uncompressed)
+└── config-6.18.58                        # The kernel config used
 ```
 
 ## Files in This Directory
 
 - `Dockerfile` - Docker image for building the kernel
 - `firecracker-minimal.config` - Minimal kernel configuration, works for the 6.x kernel
-- `build-docker.sh` - Automated build script
+- `.github/workflows/build.yml` - Automated GitHub Actions build
 
 ## Usage
 
@@ -40,7 +40,7 @@ kernel-output/
 make build
 ```
 
-Output: `kernel-output/vmlinux-6.8.12-firecracker-minimal`
+Output: `kernel-output/vmlinux-6.18.58-firecracker-minimal`
 
 ### Build Different Kernel Version
 ```bash
@@ -55,7 +55,7 @@ Create `config.json`:
 ```json
 {
   "boot-source": {
-    "kernel_image_path": "/path/to/kernel-output/vmlinux-6.8.12-firecracker-minimal",
+    "kernel_image_path": "/path/to/kernel-output/vmlinux-6.18.58-firecracker-minimal",
     "boot_args": "console=ttyS0 reboot=k panic=1 pci=off random.trust_cpu=on root=/dev/vda rw i8042.noaux i8042.nomux i8042.nopnp i8042.dumbkbd ip=172.17.0.101::172.17.0.1:255.255.255.0::eth0:off"
   },
   "drives": [
