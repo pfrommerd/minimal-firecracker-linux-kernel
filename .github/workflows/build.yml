@@ -13,11 +13,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
-    runs-on: ubuntu-24.04
+  build:
+    name: Build ${{ matrix.arch }} kernel
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+            image: vmlinux
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            image: Image
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
-    permissions:
-      contents: write
     defaults:
       run:
         shell: bash
@@ -27,8 +36,42 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Check build and release helpers
+        run: python3 -m unittest discover -s tests -v
+
       - name: Build kernel
+        env:
+          ARCH: ${{ matrix.arch }}
         run: make build
+
+      - name: Upload kernel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-${{ matrix.arch }}
+          path: kernel-output/${{ matrix.image }}-*-firecracker-minimal-${{ matrix.arch }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Download x86_64 kernel
+        uses: actions/download-artifact@v4
+        with:
+          name: kernel-x86_64
+          path: kernel-output
+
+      - name: Download aarch64 kernel
+        uses: actions/download-artifact@v4
+        with:
+          name: kernel-aarch64
+          path: kernel-output
 
       - name: Publish kernel release
         env:
@@ -37,14 +80,23 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           shopt -s nullglob
-          kernels=(kernel-output/vmlinux-*-firecracker-minimal)
-          if [[ ${#kernels[@]} -ne 1 ]]; then
-            echo "::error::Expected exactly one kernel image; found ${#kernels[@]}."
+          x86_kernels=(kernel-output/vmlinux-*-firecracker-minimal-x86_64)
+          arm_kernels=(kernel-output/Image-*-firecracker-minimal-aarch64)
+          if [[ ${#x86_kernels[@]} -ne 1 || ${#arm_kernels[@]} -ne 1 ]]; then
+            echo "::error::Expected exactly one kernel image per architecture."
             exit 1
           fi
-          kernel="${kernels[0]}"
-          if [[ ! -f "$kernel" || ! -s "$kernel" ]]; then
-            echo "::error::Kernel image is missing or empty."
+          kernels=("${x86_kernels[0]}" "${arm_kernels[0]}")
+          for kernel in "${kernels[@]}"; do
+            if [[ ! -f "$kernel" || ! -s "$kernel" ]]; then
+              echo "::error::Kernel image $kernel is missing or empty."
+              exit 1
+            fi
+          done
+          version=${x86_kernels[0]#kernel-output/vmlinux-}
+          version=${version%-firecracker-minimal-x86_64}
+          if [[ "${arm_kernels[0]}" != "kernel-output/Image-$version-firecracker-minimal-aarch64" ]]; then
+            echo "::error::Kernel versions do not match."
             exit 1
           fi
 
@@ -58,5 +110,5 @@ jobs:
               --title "$RELEASE_TAG" --generate-notes
           fi
 
-          gh release upload "$RELEASE_TAG" "$kernel" --clobber
+          gh release upload "$RELEASE_TAG" "${kernels[@]}" --clobber
           gh release edit "$RELEASE_TAG" --draft=false
