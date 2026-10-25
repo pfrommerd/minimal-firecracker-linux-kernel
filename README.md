@@ -33,6 +33,26 @@ kernel-output/
 - `firecracker-minimal.config` - Minimal kernel configuration, works for the 6.x kernel
 - `.github/workflows/build.yml` - Automated GitHub Actions build
 
+## GitHub Releases
+
+Push a tag starting with `v` to build the tagged commit and publish a release:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The workflow runs `make build` on an x86_64 Ubuntu runner and uses the kernel
+version configured in the Makefile. The release tag does not override that version.
+The only uploaded asset is `vmlinux-<kernel-version>-firecracker-minimal`;
+the kernel config and an initramfs are not included.
+
+The release is published with generated notes after the kernel builds and uploads
+successfully. If uploading or publishing fails, rerun the workflow to finish the
+draft release. An already published release causes the workflow to fail without
+changing it. Authentication uses the built-in `GITHUB_TOKEN`; no additional
+secrets are required.
+
 ## Usage
 
 ### Basic Build
