@@ -1,7 +1,7 @@
 # Firecracker Minimal Kernel Builder
 # Simple Makefile interface for Docker-based kernel builds
 
-KERNEL_VERSION ?= 6.8.12
+KERNEL_VERSION ?= 6.18.58
 OUTPUT_DIR ?= ./kernel-output
 IMAGE_NAME = firecracker-kernel-builder
 
@@ -21,7 +21,7 @@ help:
 	@echo ""
 	@echo "Examples:"
 	@echo "  make build"
-	@echo "  make build KERNEL_VERSION=6.1.0"
+	@echo "  make build KERNEL_VERSION=6.18.58"
 	@echo "  make rebuild"
 
 build: check-config
