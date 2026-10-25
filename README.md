@@ -158,3 +158,11 @@ python3 -m unittest discover -s tests -v
 These tests also run before each CI build. Kernel builds check required resolved
 config settings and the linked image’s architecture. Boot validation requires a
 Linux host with KVM, Firecracker, and a root filesystem matching each architecture.
+
+## Sapphire guest support (v1.0.3)
+
+Both architectures include built-in virtio vsock, overlayfs, ext4 security
+attributes, namespaces, cgroup v2 CPU/memory/PID controllers, seccomp, and
+veth/nftables connection tracking and NAT. ARM64 also includes PL011 console
+support. The build verifies these settings after Kconfig dependency resolution.
+No initrd or loadable modules are required.

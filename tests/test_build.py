@@ -134,6 +134,17 @@ class BuildTests(unittest.TestCase):
                         self.assertEqual(command[3:], [str(x86.relative_to(case)),
                                                       str(arm.relative_to(case)), '--clobber'])
 
+    def test_sapphire_features_are_built_in_and_checked(self):
+        required = "CGROUPS CGROUP_SCHED CFS_BANDWIDTH MEMCG CGROUP_PIDS CGROUP_BPF SECCOMP SECCOMP_FILTER VSOCKETS VIRTIO_VSOCKETS VETH NETFILTER NF_CONNTRACK NF_NAT NF_TABLES NFT_CT NFT_NAT NFT_MASQ OVERLAY_FS BLK_DEV_LOOP EXT4_FS_SECURITY".split()
+        script = (ROOT / 'scripts/build-kernel.sh').read_text()
+        for arch in ['x86_64', 'aarch64']:
+            config = (ROOT / f'firecracker-minimal-{arch}.config').read_text().splitlines()
+            for setting in required:
+                self.assertIn(f'CONFIG_{setting}=y', config)
+                self.assertIn(setting, script)
+        arm = (ROOT / 'firecracker-minimal-aarch64.config').read_text()
+        self.assertIn('CONFIG_SERIAL_AMBA_PL011_CONSOLE=y', arm)
+
     def test_shell_toolchain_selection(self):
         for arch, kernel_arch, compiler in [('x86_64', 'x86', 'x86_64-linux-gnu-'),
                                             ('aarch64', 'arm64', 'aarch64-linux-gnu-')]:
