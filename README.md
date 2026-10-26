@@ -166,3 +166,12 @@ attributes, namespaces, cgroup v2 CPU/memory/PID controllers, seccomp, and
 veth/nftables connection tracking and NAT. ARM64 also includes PL011 console
 support. The build verifies these settings after Kconfig dependency resolution.
 No initrd or loadable modules are required.
+
+## Accelerated graphics prerequisites (v1.0.5)
+
+Both architectures include built-in headless virtio-gpu, DRM render nodes,
+DMA-BUF sharing, and sync-file fences for Vulkan virtualization with Mesa Venus.
+The build checks these features after Kconfig dependency resolution. No GPU
+kernel module, display modesetting, or framebuffer console is required. These
+are guest kernel prerequisites; acceleration still requires a compatible VMM,
+host renderer, and guest Mesa installation.

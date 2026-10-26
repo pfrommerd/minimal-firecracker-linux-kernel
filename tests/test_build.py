@@ -135,7 +135,7 @@ class BuildTests(unittest.TestCase):
                                                       str(arm.relative_to(case)), '--clobber'])
 
     def test_sapphire_features_are_built_in_and_checked(self):
-        required = "CGROUPS CGROUP_SCHED CFS_BANDWIDTH MEMCG CGROUP_PIDS CGROUP_BPF SECCOMP SECCOMP_FILTER VSOCKETS VIRTIO_VSOCKETS VETH NETFILTER NF_CONNTRACK NF_NAT NF_TABLES NFT_CT NFT_NAT NFT_MASQ OVERLAY_FS BLK_DEV_LOOP EXT4_FS_SECURITY".split()
+        required = "VIRTIO_MENU DRM DRM_VIRTIO_GPU DMA_SHARED_BUFFER VIRTIO_DMA_SHARED_BUFFER SYNC_FILE SHMEM CGROUPS CGROUP_SCHED CFS_BANDWIDTH MEMCG CGROUP_PIDS CGROUP_BPF SECCOMP SECCOMP_FILTER VSOCKETS VIRTIO_VSOCKETS VETH NETFILTER NF_CONNTRACK NF_NAT NF_TABLES NFT_CT NFT_NAT NFT_MASQ OVERLAY_FS BLK_DEV_LOOP EXT4_FS_SECURITY".split()
         script = (ROOT / 'scripts/build-kernel.sh').read_text()
         for arch in ['x86_64', 'aarch64']:
             config = (ROOT / f'firecracker-minimal-{arch}.config').read_text().splitlines()
