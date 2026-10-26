@@ -14,7 +14,7 @@ case "$TARGET_ARCH" in
         target=Image
         image=arch/arm64/boot/Image
         machine=AArch64
-        required='ARM64 ARM64_4K_PAGES ARM_GIC ARM_ARCH_TIMER SERIAL_OF_PLATFORM RTC_DRV_PL031 SERIAL_AMBA_PL011_CONSOLE'
+        required='ARM64 ARM64_4K_PAGES ARM_GIC ARM_ARCH_TIMER SERIAL_OF_PLATFORM RTC_DRV_PL031 SERIAL_AMBA_PL011_CONSOLE NO_HZ_IDLE VIRTIO_BALLOON PAGE_REPORTING'
         ;;
     *) echo "Unsupported TARGET_ARCH: $TARGET_ARCH" >&2; exit 1 ;;
 esac
